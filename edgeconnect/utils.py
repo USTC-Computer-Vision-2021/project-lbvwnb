@@ -36,7 +36,6 @@ def regionfillLaplace(I, mask, maskPerimeter):
     # Number the mask pixels in a grid matrix
     grid = -np.ones((height, width))
     grid[maskIdx] = range(0, maskIdx[0].size)
-    # Pad with zeros to avoid "index out of bounds" errors in the for loop
     grid = padMatrix(grid)
     gridIdx = np.where(grid >= 0)
 
@@ -44,10 +43,9 @@ def regionfillLaplace(I, mask, maskPerimeter):
     # Connect each mask pixel to itself
     i = np.arange(0, maskIdx[0].size)
     j = np.arange(0, maskIdx[0].size)
-    # The coefficient is the number of neighbors over which we average
     numNeighbors = computeNumberOfNeighbors(height, width)
     s = numNeighbors[maskIdx]
-    # Now connect the N,E,S,W neighbors if they exist
+  
     for direction in ((-1, 0), (0, 1), (1, 0), (0, -1)):
         # Possible neighbors in the current direction
         neighbors = grid[gridIdx[0] + direction[0], gridIdx[1] + direction[1]]
