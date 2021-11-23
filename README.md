@@ -34,5 +34,14 @@ python video_completion.py \
        --H_scale 2 \
        --W_scale 2 \
        --seamless
+       
+Besides,we need prepare:
+
+opencv-python
+opencv-contrib-python
+imageio
+imageio-ffmpeg
+scipy
+scikit-image
 
 
