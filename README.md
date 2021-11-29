@@ -23,7 +23,15 @@ python demo.py --data data/Human6
 (https://user-images.githubusercontent.com/94847760/143771358-2b15d256-d427-4af2-9a87-4c43ea069f02.gif)
 
 被边框选定的对象会被移除，处理后的视频将保存在results/inpainting文件夹中：
-处理前后：
+处理前后：<img width="591" alt="sgif-1-1-1" src="https://user-images.githubusercontent.com/94847760/143881800-5c1c44a6-f202-42c9-859a-7c9d02d39a95.PNG">
+![image](https://user-images.githubusercontent.com/94847760/143882060-0e536e29-2b5e-42b2-930d-f0414e5abad8.png)
+![image](https://user-images.githubusercontent.com/94847760/143882275-ad47415f-cfd2-49b6-8998-cf9eb8dd9e3e.png)
+<img width="584" alt="sgif-1-1-4" src="https://user-images.githubusercontent.com/94847760/143883019-c0c60f37-242b-4d9c-bbbd-562e3c855622.PNG">
+
+
+
+
+
 
 
 
