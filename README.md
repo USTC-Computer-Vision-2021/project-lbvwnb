@@ -22,6 +22,10 @@ python demo.py --data data/Human6
 画一个边框：
 (https://user-images.githubusercontent.com/94847760/143771358-2b15d256-d427-4af2-9a87-4c43ea069f02.gif)
 
+被边框选定的对象会被移除，处理后的视频将保存在results/inpainting文件夹中：
+处理前后：
+
+
 
 
 
