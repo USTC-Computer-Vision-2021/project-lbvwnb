@@ -35,8 +35,8 @@ L=λ_R L_R+λ_F L_F+λ_W L_W
 其中，L_R为重建损失，L_F为流动损失，L_W为规整损失，权重因子依次为1, 10, 1。
 
 3.3、原理的代码实现
-Get_mask部分主要由mask.py里的mask函数来实现
-Inpainting部分主要由inpaint.py里的inpaint函数来实现
+Get_mask部分主要由mask.py里的mask函数来实现；
+Inpainting部分主要由inpaint.py里的inpaint函数来实现；
 上述函数中用到的现有模型和工具函数分别在get_mask和inpainting文件夹的models和utils中定义。
 
 
