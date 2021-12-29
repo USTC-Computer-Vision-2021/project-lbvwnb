@@ -37,7 +37,21 @@ VInet网络的大致框架如下图所示：
 
 3.3 代码实现：
 Get_mask部分主要由下面的函数实现——
-mask.py里的mask函数
+import torch.nn as nn
+
+
+class Mask(nn.Module):
+    def __init__(self):
+        super(Mask, self).__init__()
+
+    def forward(self, z_f, x_f):
+        raise NotImplementedError
+
+    def template(self, template):
+        raise NotImplementedError
+
+    def track(self, search):
+        raise NotImplementedError
 
 Inpainting部分主要由下面的函数实现——
 inpaint.py里的inpaint函数
