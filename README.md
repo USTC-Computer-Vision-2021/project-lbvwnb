@@ -1,7 +1,32 @@
-<img width="421" alt="捕获1" src="https://user-images.githubusercontent.com/94847760/147587070-63499f95-10f7-4ef1-a297-ab4fc26165e7.PNG">
-<img width="418" alt="捕获2" src="https://user-images.githubusercontent.com/94847760/147587082-76dd69c9-eda9-45f4-b902-162e9094f4fa.PNG">
-<img width="421" alt="捕获3" src="https://user-images.githubusercontent.com/94847760/147587089-e499fb8a-9ef1-4d53-9f53-08ea900a01d9.PNG">
-<img width="420" alt="捕获4" src="https://user-images.githubusercontent.com/94847760/147587100-3bdfc2a7-a9a6-4ab0-a1c2-2c64a301d018.PNG">
+基于图像分割的指定视频对象移除
+
+1、成员及分工：
+张驰
+    coding
+赵天翔
+    coding
+
+2、问题描述
+背景：随着移动互联网时代的来临，视频成为了信息传播的重要媒介，每时每刻都有海量的视频内容被上传到互联网。
+产生的问题：拍摄者上传的视频中，常有与视频无关的人出镜，而视频上传者往往未经其授权。即使拍摄者隐私权意识较强，与所有无关出镜者沟通以获取授权也是困难重重。于是侵犯隐私权的现象便屡见不鲜。
+技术角度的解决方案：编写程序，绘制一个边界框，对边界框中的选定视频对象进行移除。
+3、原理分析：
+视频对象擦除，顾名思义，就是要让视频中的某个特定对象（如：移动的汽车、行走的路人等）从视频的每一帧画面中消失，取而代之的是该对象所在画面位置处的背景。可见整个过程主要涉及到两部分操作：一是找出选定对象在每一帧的具体位置，即找出一个Mask将对象给“框选”出来；然后便是将Mask中的每一个像素都用预测的背景像素替代，即对该Mask圈出的画面的消失部分进行修补（inpainting）。因此，需要解决的核心问题也就变成了：如何追踪某个选定对象在视频中不断变化位置，以及如何根据视频相邻帧画面之间的关联给出背景像素的预测结果。事实上，两个问题的关键都在于利用视频中的每一帧数据在时间上的连续性，借此来训练对应的网络模型进行相关预测。在本项目中，前者主要通过区域生成网络（RPN）实现，而后者则通过视频修补网络（VInet）实现。
+
+3.1 Mask的获得（get_mask）——
+Mask的获得严格意义上介于传统的视频对象追踪（video object tracking）以及视频对象分离（video object segmentation）任务之间，本项目中采用的SiamMask便是对两者解决方法的一个整合与优化。其具体运行流程可以简述如下：在视频初始帧中框选感兴趣对象后，自动识别其中真正属于目标的像素（因为框选部分可能存在背景像素），并对后续帧中该目标的位置进行估计和预测。而为了实现这一目标，SiamMask的训练过程也被划分为三步：首先，学习构建一套相似性准则用以度量目标对象和以滑动窗口形式送入的众多候选对象之间的相似性。因为这样得到的输出只能显示对象的位置，为了进一步确定其空间上的信息，将对象准确分离出来，接下来便要通过RPN实现边框回归（bounding box regression）,并进行类不可知的二元分割（class-agnostic binary segmentation）。
+另一方面，SiamMask网络模型是基于已有的全卷积暹罗网络构建的，主要是给原来的暹罗追踪器引入了一个额外的分支和损失函数。而这一改变将得到两种SiamMask变体：三分支变体和双分支变体。其结构简图如下：
+![image](https://user-images.githubusercontent.com/94847760/147634865-defadc54-a195-4edc-9baf-2eb9be56ef8e.png)
+二者将分别优化多任务损失函数![image](https://user-images.githubusercontent.com/94847760/147635064-662d2872-3e3f-457c-a3ba-c4f30137313e.png和![image](https://user-images.githubusercontent.com/94847760/147635103-0050e646-b3f5-4593-a5c6-c007309743bd.png)
+，网络的训练也将围绕该目标展开。
+3．2 视频修补（video_inpainting）——
+设包含有消失区域的视频各帧为![image](https://user-images.githubusercontent.com/94847760/147635147-080ae3da-f633-42e6-84ea-9fda63b08bd2.png)，而填充了消失区域的真实视频各帧为![image](https://user-images.githubusercontent.com/94847760/147635187-06dfbe1f-b423-4a7e-9eb4-e6c401cbf073.png)，那么inpainting的目的就是学习一个从![image](https://user-images.githubusercontent.com/94847760/147635241-ed1168d2-1573-461c-bb2c-b20902842a89.png)到![image](https://user-images.githubusercontent.com/94847760/147635270-6273eb47-e3a3-44fd-bf44-522cd16b0a53.png)的映射，使得条件分布![image](https://user-images.githubusercontent.com/94847760/147635306-35046485-21e7-4a44-9666-373d8b9005bb.png)，![image](https://user-images.githubusercontent.com/94847760/147635405-140e75d2-785f-4122-b53a-48c3084be843.png)由下式计算得到：
+![image](https://user-images.githubusercontent.com/94847760/147635342-a8541275-4abd-443f-b3e8-238c6ea96360.png)
+
+
+
+
+
 3.3 代码实现：
 Get_mask部分主要由下面的函数实现——
 mask.py里的mask函数
