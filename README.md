@@ -18,9 +18,11 @@ Mask的获得严格意义上介于传统的视频对象追踪（video object tra
 另一方面，SiamMask网络模型是基于已有的全卷积暹罗网络构建的，主要是给原来的暹罗追踪器引入了一个额外的分支和损失函数。而这一改变将得到两种SiamMask变体：三分支变体和双分支变体。其结构简图如下：
 ![image](https://user-images.githubusercontent.com/94847760/147634865-defadc54-a195-4edc-9baf-2eb9be56ef8e.png)
 二者将分别优化多任务损失函数![image](https://user-images.githubusercontent.com/94847760/147635617-d4409682-f574-4058-b02d-2f8510873f7d.png)和![image](https://user-images.githubusercontent.com/94847760/147635638-5ba9df28-ce79-4d07-ac9f-c980e2b38ed6.png)，网络的训练也将围绕该目标展开。
+
 3．2 视频修补（video_inpainting）——
 设包含有消失区域的视频各帧为![image](https://user-images.githubusercontent.com/94847760/147635147-080ae3da-f633-42e6-84ea-9fda63b08bd2.png)，而填充了消失区域的真实视频各帧为![image](https://user-images.githubusercontent.com/94847760/147635187-06dfbe1f-b423-4a7e-9eb4-e6c401cbf073.png)，那么inpainting的目的就是学习一个从![image](https://user-images.githubusercontent.com/94847760/147635241-ed1168d2-1573-461c-bb2c-b20902842a89.png)到![image](https://user-images.githubusercontent.com/94847760/147635270-6273eb47-e3a3-44fd-bf44-522cd16b0a53.png)的映射，使得条件分布![image](https://user-images.githubusercontent.com/94847760/147635306-35046485-21e7-4a44-9666-373d8b9005bb.png)，![image](https://user-images.githubusercontent.com/94847760/147635405-140e75d2-785f-4122-b53a-48c3084be843.png)由下式计算得到：![image](https://user-images.githubusercontent.com/94847760/147635564-5a1931d4-83cd-4254-a478-c01860d2e09f.png)
-其中，N取2，意为取预测帧的前后各两帧数据，而采样步长为3，亦即![image](https://user-images.githubusercontent.com/94847760/147635688-b47ffbdd-fb10-4a10-84ca-e6d7324b93f3.png)，![image](https://user-images.githubusercontent.com/94847760/147635710-79bfeec7-105c-4fd8-9c9d-bd17c095fde2.png)
+其中，N取2，意为取预测帧的前后各两帧数据，而采样步长为3，亦即![image](https://user-images.githubusercontent.com/94847760/147636101-7abe505a-afc1-4709-9d7c-0fb5ee002153.png)
+，![image](https://user-images.githubusercontent.com/94847760/147635710-79bfeec7-105c-4fd8-9c9d-bd17c095fde2.png)
 为由之前帧得到的记忆信息，以确保预测帧的时间一致性。
 这一学习过程则主要通过VInet实现。其设计初衷是期望通过改造一个前馈深度网络来实现视频修补，而这个新的深度CNN模型所具有的最为核心的两个功能，便是时间特征聚合以及时间连续性保留。对于前者，VInet设计者将视频修补任务转换成了一个“多到一”的连续帧的修补问题，借此引入一个新的基于图像编码解码模型的3D-2D前馈神经网络，用于收集并提炼视频相邻帧之间的潜在关联，从而据此在时间和空间两个维度合成语义一致的视频内容。而对于后者，设计者则采用了一个递归反馈层和一个记忆层来实现。除此之外，模型中还分别设置了流动损失函数和规整损失函数，分别用于学习先前合成帧的规整和加强inpainting结果中的长短期一致性。
 VInet网络的大致框架如下图所示：
@@ -30,6 +32,7 @@ VInet网络的大致框架如下图所示：
 网络训练用到的损失函数定义如下：
 ![image](https://user-images.githubusercontent.com/94847760/147635808-5e80e0f7-3a96-471b-937c-ecc7da9de28a.png)
 其中，![image](https://user-images.githubusercontent.com/94847760/147635830-08635a52-8db0-4559-a5cc-882dcd1f43c9.png)、![image](https://user-images.githubusercontent.com/94847760/147635855-2ce2d4b0-fcb3-4acd-b2fc-9413311cce6e.png)、![image](https://user-images.githubusercontent.com/94847760/147635868-36d9999b-40c8-4f2a-93bc-91ce4bc7085f.png)分别为重建损失，流动损失和规整损失，权重因子分别为1、10、1.
+
 3.3 代码实现：
 Get_mask部分主要由下面的函数实现——
 mask.py里的mask函数
